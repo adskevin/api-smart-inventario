@@ -4,18 +4,17 @@ const http = require('http').Server(app)
 const mongoose = require('mongoose');
 const cors = require('cors');
 var port = 3001;
-var dbString = "";
 
 try {
   let result = require('dotenv').config();
   if(result.error) {
     console.log(result.error);
-  } else {
-    dbString = process.env.MDB_CONN_STRING;
   }
 } catch (error) {
   console.log('Erro ao carregar a dependência "dotenv" - ' + error);
 }
+
+var dbString = process.env.MDB_CONN_STRING;
 
 //Importa Rotas
 const authRoute = require('./routes/auth_route');
