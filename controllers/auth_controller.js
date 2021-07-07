@@ -33,7 +33,6 @@ exports.auth = (req, res) => {
 
 exports.checkToken = (req, res, next) => {
   const token = req.get("x-auth-token");
-  console.log('token ' + token);
   if (!token) {
       res.status(401).send("No token");
   }
@@ -43,7 +42,6 @@ exports.checkToken = (req, res, next) => {
               res.status(400).json({ error: "Error" });
           }
           else {
-              console.log(tokenInfo);
               req.decodedUser = tokenInfo.user;
               next();
           }

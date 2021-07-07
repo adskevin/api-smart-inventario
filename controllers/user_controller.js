@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const helper = require('../helpers/user_helper');
 
 exports.list = (req, res) => {
-    helper.checkRole(req.body);
     User.find({},(err, users) => {
         if (err) {
             res.status(500).json(err);
@@ -27,6 +26,22 @@ exports.findUser = (req, res) => {
                 res.status(400).json({ error: "Bad request." });
             }
         });
+    }
+}
+
+exports.deleteById = (req, res) => {
+    if (req.params && req.params.id) {
+        User.findOneAndDelete({ _id: req.params.id }, (err, user) => {
+            if (err) {
+                return res.status(500).json(err);
+            }
+            if (!user) {
+              return res.status(400).json({ error: "User does not exists" });
+            }
+            return res.status(200).json(user);
+        })
+    } else {
+        return res.status(400).json({ error: "No params received" });
     }
 }
 
@@ -81,7 +96,7 @@ exports.validateField = async (req, res) => {
 }
 
 exports.checkRole = async (req, res, next) => {
-  if(!req.decodedUser) return res.status(400).json({ error: "Bad request." });
+  if(!req.decodedUser) return res.status(400).json({ error: "Bad request. (role)" });
   if(req.decodedUser && req.decodedUser.role) {
     if(req.decodedUser.role !== 'admin') {
       return res.status(400).json({ error: "Bad request." });
