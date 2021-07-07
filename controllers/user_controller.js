@@ -1,6 +1,5 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const helper = require('../helpers/user_helper');
 
 exports.list = (req, res) => {
@@ -46,23 +45,15 @@ exports.deleteById = (req, res) => {
 }
 
 exports.putById = (req, res) => {
-    console.log(req.body);
     if (req.params && req.params.id) {
         if (req.body) {
-            User.findOne({ _id: req.params.id }, (err, user) => {
+            User.findOneAndUpdate({ _id: req.params.id }, req.body, (err, user) => {
                 if (err) {
                     return res.status(500).json(err);
                 }
                 if (!user) {
                   return res.status(400).json({ error: "User does not exists" });
                 }
-                if (req.body.name) {
-                  user.name = req.body.name;
-                }
-                if (req.body.role) {
-                  user.role = req.body.role;
-                }
-                user.save();
                 return res.status(200).json(user);
             })
         } else {
@@ -75,12 +66,9 @@ exports.registerUser = (req, res) => {
     if (req.body && helper.verifyFields(req.body)) {
         bcrypt.hash(req.body.password, 10, function(err, hashedPassword) {
             if (err) return res.status(400).json({ error: "Bad request" });
-            User.create({
-                name: req.body.name,
-                password: hashedPassword,
-                email: req.body.email,
-                role: 'user'
-            }, (err, user) => {
+            req.body.password = hashedPassword;
+            req.body.role = req.body.role ? req.body.role : 'user';
+            User.create(req.body, (err, user) => {
                 if (err) {
                   console.log(err);
                   return res.status(400).json({ error: "Bad request. Too few arguments." });
