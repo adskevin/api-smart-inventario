@@ -125,7 +125,15 @@ exports.checkRole = async (req, res, next) => {
   if(!req.decodedUser) return res.status(400).json({ error: "Bad request. (role)" });
   if(req.decodedUser && req.decodedUser.role) {
     if(req.decodedUser.role !== 'admin') {
-      return res.status(400).json({ error: "Bad request." });
+      if (req.method !== "PUT") {
+        return res.status(400).json({ error: "Bad request." });
+      }
+      if (req.params && req.params.id && (req.decodedUser._id !== req.params.id)) {
+        return res.status(401).json({ error: "Unauthorized." });
+      }
+      if (req.body.role && req.body.role === "admin") {
+        return res.status(401).json({ error: "Unauthorized. You can not make yourself an Administrator" });
+      }
     }
   }
   next();
