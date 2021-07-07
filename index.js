@@ -21,6 +21,7 @@ const authRoute = require('./routes/auth_route');
 const userRoute = require('./routes/user_route');
 const categoryRoute = require('./routes/category_route');
 const departmentRoute = require('./routes/department_route');
+const inventoryRoute = require('./routes/inventory_route');
 
 // for parsing application/json
 app.use(express.json());
@@ -55,6 +56,7 @@ app.use('/auth', authRoute);
 app.use('/users', userRoute);
 app.use('/categories', categoryRoute);
 app.use('/departments', departmentRoute);
+app.use('/inventories', inventoryRoute);
 
 http.listen(process.env.PORT || port, () => {
   if (process.env.PORT) {
