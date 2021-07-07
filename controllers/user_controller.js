@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const helper = require('../helpers/user_helper');
 
 exports.list = (req, res) => {
+    helper.checkRole(req.body);
     User.find({},(err, users) => {
         if (err) {
             res.status(500).json(err);
@@ -35,7 +36,6 @@ exports.registerUser = (req, res) => {
             if (err) return res.status(400).json({ error: "Bad request" });
             User.create({
                 name: req.body.name,
-                login: req.body.login,
                 password: hashedPassword,
                 email: req.body.email,
                 role: 'user'
@@ -50,17 +50,6 @@ exports.registerUser = (req, res) => {
         });
     } else {
         return res.status(400).json({ error: "Bad request. Too few arguments." });
-    }
-}
-
-exports.setActiveSocket = async (userId, socketId) => {
-    if (socketId) {
-        return await User.findOneAndUpdate({ _id: userId }, { activeSocketId: socketId }, { new: true }, (err, user) => {
-            if(err){
-                return err;
-            }
-            return user;
-        });
     }
 }
 
@@ -89,4 +78,14 @@ exports.validateField = async (req, res) => {
     }
   }
   return res.status(400).json({ error: "Bad request." });
+}
+
+exports.checkRole = async (req, res, next) => {
+  if(!req.decodedUser) return res.status(400).json({ error: "Bad request." });
+  if(req.decodedUser && req.decodedUser.role) {
+    if(req.decodedUser.role !== 'admin') {
+      return res.status(400).json({ error: "Bad request." });
+    }
+  }
+  next();
 }
