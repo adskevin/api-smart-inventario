@@ -45,6 +45,32 @@ exports.deleteById = (req, res) => {
     }
 }
 
+exports.putById = (req, res) => {
+    console.log(req.body);
+    if (req.params && req.params.id) {
+        if (req.body) {
+            User.findOne({ _id: req.params.id }, (err, user) => {
+                if (err) {
+                    return res.status(500).json(err);
+                }
+                if (!user) {
+                  return res.status(400).json({ error: "User does not exists" });
+                }
+                if (req.body.name) {
+                  user.name = req.body.name;
+                }
+                if (req.body.role) {
+                  user.role = req.body.role;
+                }
+                user.save();
+                return res.status(200).json(user);
+            })
+        } else {
+            return res.status(400).json({ error: "No params received" });
+        }
+    }
+}
+
 exports.registerUser = (req, res) => {
     if (req.body && helper.verifyFields(req.body)) {
         bcrypt.hash(req.body.password, 10, function(err, hashedPassword) {

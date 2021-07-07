@@ -1,18 +1,10 @@
 const express = require('express');
 const app = express();
 const http = require('http').Server(app)
-const io = require('socket.io')(http);
-const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const cors = require('cors');
 var port = 3001;
 var dbString = "";
-var CodeGenerator = require('node-code-generator');
-var generator = new CodeGenerator();
-const { findRoom, createRoom, joinRoom, closeRoom, getRoomByUserId, getPopulatedRoom, leaveRoom } = require('./controllers/room_controller');
-// const { getActiveRoom } = require('./controllers/user_controller');
-const { setActiveSocket } = require('./controllers/user_controller');
-
 
 try {
   let result = require('dotenv').config();
@@ -27,7 +19,6 @@ try {
 
 //Importa Rotas
 const authRoute = require('./routes/auth_route');
-const registerRoute = require('./routes/register_route');
 const userRoute = require('./routes/user_route');
 
 // for parsing application/json
@@ -60,7 +51,6 @@ app.use('/welcome', (req, res) => {
 
 //Uso das rotas
 app.use('/auth', authRoute);
-app.use('/register', registerRoute);
 app.use('/users', userRoute);
 
 http.listen(process.env.PORT || port, () => {
